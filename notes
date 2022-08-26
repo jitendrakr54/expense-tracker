@@ -1,0 +1,53 @@
+index.js is the first file to execute
+
+We don't import our custom components in index.js, we do so only once for root.
+Instead we import in App.js
+
+Composition(Children props) :
+
+In App.js we're using Expenses, in there we are using ExpenseItem, in there we're using ExpenseDate.
+Generally, this approach of building a user interface from smaller building blocks is called composition.
+
+Card:
+Instead in general, in web development, when you hear the term card, it's typically means some kind of container look
+with rounded corners, drop shadows, and elements like these.
+
+. you can't use your custom components as wrappers around other kind of content. Having content between opening and closing tags doesn't work just like that.
+eg:
+<Card className="expense-item">
+<ExpenseDate date={props.date} />
+
+<div className="expense-item__description">
+<h2>{props.title}</h2>
+<div className="expense-item__price">${props.amount}</div>
+</div>
+</Card>
+
+But of course it does work for built-in HTML elements, like the div or the h2 tag.
+eg:
+
+<div className="expense-item">
+<ExpenseDate date={props.date} />
+<div className="expense-item__description">
+<h2>{props.title}</h2>
+<div className="expense-item__price">${props.amount}</div>
+</div>
+</div>
+
+So it would be nice if we could also make it work for our custom components to build such reusable wrapper components
+like this, And of course, React has a solution here. We can build such wrapper components. In Card.js we again, when I accept props. But now, as I mentioned we'll not work with some attributes but instead we will use one special prop
+which is built into React, which every component receives, even if you're never setting it explicitly. And that's a prop which value I wanna output between the opening and closing tag of this div, inside of the card component function.
+It's the props.children prop. children is a reserved name. We don't set a children prop on this card.
+I'm setting a class named prop and actually at the moment, this won't do anything. But I'm not setting a children prop.
+Children, as I said, is a reserved name and the value of this special children prop will always be the content between the opening and closing tags of your custom component. So in this case, this content between the opening and closing card tag, that is what will be available on props.children inside of that card.
+
+Now, why would we do that? What did we gain by doing that? Well, in this case, of course, not a whole lot
+but we were able to extract some code duplication from inside our CSS files into this separate wrapper component.
+And it's not just a duplicate CSS code. We also were able to extract this HTML code, this JSX code, this div here.
+In this case, it's just one div but throughout the course you will also see more complex wrapper components
+which might have a more complex JSX structure. Things like modals and alerts. And in such cases, being able to extract that often allows you to save a lot of code duplication and it often allows you to keep your other components clean.
+And this is another aspect of composition. We compose our ExpenseItem component by using card as a wrapper,
+by using some built-in HTML elements, and by then all the putting in the ExpenseDate. And all these components and elements are composed together to form the overall ExpenseItem component which then again, is used in other components
+to in the end overall, build the overall user interface.So composition is important.
+You use it all the time when working with React. Whenever you combine components, you are using composition.
+And an especially important part of composition is this props children feature which allows you to also create wrapper components which is a special type of component
