@@ -92,3 +92,36 @@ This is why we need that. That's the under-the-hood, behind-the-scenes stuff
 
 As your project grows and as you have more and more components you might want to organize them into sub folders
 and not just throw them all into one components folder. And, indeed, that is something we can already get started with.Here, we could argue that we have some general UI components some general user interface elements, which are not tied to a specific feature of the app. And then, we got some features specific components, like these components, which are dealing with rendering expenses and expense data. And, therefore, in the components sub folder, we could create an Expenses sub folder, and next to that a UI sub folder for general user interface elements. And we could move the card files into the UI folder and the Expenses, ExpenseItem, and ExpenseDate files into the Expenses folder.
+
+Adding events on html element:
+To all these built-in HTML elements, we can add supported event listeners basically. OnClick, for example, basically is available on every element. Some events are only available on specific elements. But that is all based on the default DOM behavior. If an element supports an event, then you can add a listener with React by adding such an on and then the event name prop. Just make sure that the event name starts with a capital character, like in the case of onClick here.
+And then you just point at a function, either defined in line here or, better, defined upfront, and React will execute that function for you when that event occurs. That's how you add events.
+
+Now, one word about naming these functions. It is a convention which you don't have to follow but which you might consider following that you name your functions like this. If they are triggered upon an event, that you end with handler. This is not a must-do, and not every React developer does it,
+
+State is actually not a React specific concept but it is a key concept in React as well. And here in ExpenseItem,
+we have a scenario where we wanna use that built-in state concept. Because this title here which changes when the clickHandler executes is actually data that should result in this component being re-evaluated and re-drawn on the screen when it's changes, when that's title data changes. And by default, regular variables like this one, are not triggering such a re-evaluation. React doesn't care about that. If you have a variable in your component function
+and the that variable changes, React ignores it. It doesn't care about that, that code executes, sure,
+but the overall component function doesn't execute again.
+
+So to tell React that it should run it again, we need to import something from the React library. And we do it as by adding a so-called named import. This here, is the default import. Now, we can add a comma and curly braces and between the curly braces we can now extract specifically named things from the React library.
+And we want to import a function here, a function which is called useState. This is a function provided by the React library and this function allows us to define values as state where changes to these values should reflect
+in the component function being called again, which is a key difference to the regular variable we're using here.
+
+Now, how do we use this useState function though? Well, it's very simple. Inside of our component function and that's important, we have to do that inside of this function. We just call useState. And useState is a so-called React hook.
+And all these React hooks can be recognized by the fact that they start with the word "use" in their name,
+and all these hooks must only be called inside of React component functions like ExpenseItem. They can't be called outside of these functions, like this. And they all just shouldn't be called in any nested functions.
+They must be called directly inside such component functions. There is one exception which we'll talk about later
+but for the moment, that is what you should keep in mind.
+
+we will be assigning new values by calling a function. That's just how this state variable thing works. And for that useState actually returns an array where the first value is the variable itself, you could say, the value itself.
+And the second element in the array is that updating function.
+
+UseState registers some State, so some value as a State for the component in which it is being called. And I wanna be even more precise here. It registers it for a specific component instance. For example, ExpenseItem here is being used four times, right? And Expenses.js we have four ExpenseItems. Now, every item receives its own separate State
+which is detached from the other States. We have one ExpenseItem definition here, but then this function is basically called four times when we create four ExpenseItems. And every time it's called, a new separate State is created
+of course in the same way but managed independently by React. So if we change the title in the first ExpenseItem
+the other ones are not affected because they have their own State. That's really important. It's on a per component instance basis.
+
+Thus far, we update our state upon user events (e.g. upon a click).
+That's very common but not required for state updates! You can update states for whatever reason you may have.
+Later in the course, we'll see Http requests that complete (where we then want to update the state based on the Http response we got back) but you could also be updating state because a timer (set with setTimeout()) expired for example.
