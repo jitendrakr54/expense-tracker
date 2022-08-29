@@ -1,6 +1,8 @@
-import Expenses from "./components/Expenses";
+import React from "react";
+import Expenses from "./components/Expenses/Expenses";
 
-function App() {
+// function App() {
+const App = () => {
   const expenses = [
     {
       id: "e1",
@@ -29,6 +31,14 @@ function App() {
       <Expenses items={expenses}></Expenses>
     </div>
   );
-}
+
+  // Below code shows how react convert above code behind the scene
+  // return React.createElement(
+  //   "div",
+  //   {},
+  //   React.createElement("h2", {}, "Let's get started"),
+  //   React.createElement(Expenses, { items: expenses })
+  // );
+};
 
 export default App;

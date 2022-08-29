@@ -51,3 +51,44 @@ by using some built-in HTML elements, and by then all the putting in the Expense
 to in the end overall, build the overall user interface.So composition is important.
 You use it all the time when working with React. Whenever you combine components, you are using composition.
 And an especially important part of composition is this props children feature which allows you to also create wrapper components which is a special type of component
+
+In App.js we directly write JSX code but how this works behind the scene. Let's convert below JSX code -
+
+<div>
+<h2>Let's get started!</h2>
+<Expenses items={expenses}></Expenses>
+</div>
+
+converted:
+React.createElement('div', {},
+React.createElement('h2', {}, "Let's get started"),
+React.createElement(Expenses, {items: expenses}));
+
+There is a createElement method, which we can call. And when you use JSX, it's near this method which is called.
+CreateElement takes three arguments. The first argument is the element which should be created. For example, a div.
+And if it's a built-in HTML element,you just pass in a string with the name of that element, like div.
+The second argument is an object that configures this element. Specifically, an object which sets all the attributes
+of this element. This div has no attributes, so here we can pass in an empty object {}. The third argument now is the content between the opening and closing div tags. And actually it's not just a third argument. You can now have an infinitely long list of arguments, which are the different content pieces between the opening and closing tags.
+So here we have two elements, so we would have two extra arguments. The third argument would be our H2 element.
+So the first child in that div. And therefore here, again, we would call React createElement and create an H2 element here. And that H2 element, again, has no attributes, so the second argument of this second createElement call
+would be an empty object. And the third argument of this createElement call would be the content in this H2 tag,
+so this string, in this case. So we would pass this string here, and escape this single quote. And if we now format it, it would look like this. Now next to this second createElement call, We could have a third createElement call,
+which is the neighbor element to this H2 element, so this expenses component. Again, we create an element here,
+but now we're working with a custom component instead of a built-in one. In such cases, you don't use a string here,
+but you just point at your imported function, which it in the end is, because your components are just functions, right?
+So here we set Expenses. We point at Expenses as an element here. The second argument is an object of properties
+that should be set, of attributes that should be set, and here we have the items prop, the items attribute,
+so we would add an items key here. Keep in mind, this is just a JavaScript object, so we have the property name, and then a colon, and then the value, which here would be expenses. And then as a third argument, we have to content between the opening and closing tags. And in this case, there is no such contents, so we omit it. And this here would be the alternative to this JSX code using this React object.
+
+And this here would be the alternative to this JSX code using this React object. And therefore, if I saved that, we go back to the screen, we see exactly the same as before. Now, you could write your entire React app like this. It just turns out that this is a bit harder to read and a bit more cumbersome than using this JSX code. But that's why you needed to import React from React in all your component files in the past, because this is the under-the-hood code
+which kind of gets created automatically when you use JSX. Now in more modern project setups, you can omit this React import because the project setup is able to make that transformation without the import being added. But if you see component functions where this import is there, it is there because, in the past, you always did need to add it.
+And therefore, because of that reason, I will now also import it and add it to all components where I use some JSX code.
+
+And if you have a look at this code, it should also be clear why you need some wrapping element as a root JSX element.
+Why you can't have just these two side-by-side elements being returned. Because how will you write this in the React
+createElement world? You, in the end, would be trying to return this, and that doesn't work. You can't return more than one thing. You could return an array, sure, but this is not an array of elements. This is two separate elements side by side. That's why you always need such a wrapper, because in createElement world, you always create one element
+which then may have more child elements. So that's why we have this one wrapper root JSX element which we always need.
+This is why we need that. That's the under-the-hood, behind-the-scenes stuff
+
+As your project grows and as you have more and more components you might want to organize them into sub folders
+and not just throw them all into one components folder. And, indeed, that is something we can already get started with.Here, we could argue that we have some general UI components some general user interface elements, which are not tied to a specific feature of the app. And then, we got some features specific components, like these components, which are dealing with rendering expenses and expense data. And, therefore, in the components sub folder, we could create an Expenses sub folder, and next to that a UI sub folder for general user interface elements. And we could move the card files into the UI folder and the Expenses, ExpenseItem, and ExpenseDate files into the Expenses folder.
