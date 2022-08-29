@@ -92,3 +92,50 @@ This is why we need that. That's the under-the-hood, behind-the-scenes stuff
 
 As your project grows and as you have more and more components you might want to organize them into sub folders
 and not just throw them all into one components folder. And, indeed, that is something we can already get started with.Here, we could argue that we have some general UI components some general user interface elements, which are not tied to a specific feature of the app. And then, we got some features specific components, like these components, which are dealing with rendering expenses and expense data. And, therefore, in the components sub folder, we could create an Expenses sub folder, and next to that a UI sub folder for general user interface elements. And we could move the card files into the UI folder and the Expenses, ExpenseItem, and ExpenseDate files into the Expenses folder.
+
+How can you manage more than one State?
+
+It is something we have learned up to this point but it turns out that it is rather simple. You can call useState more than once. You can have multiple States, multiple States slices or State pieces per component. And all of these States inside of one at the same component will then all to be totally separated from each other.
+
+// const [enteredTitle, setEnteredTitle] = useState("");
+// const [enteredAmount, setenteredAmount] = useState("");
+// const [enteredDate, setEnteredDate] = useState("");
+
+However, there also is an alternative and it depends basically on your personal preferences which approach you prefer.
+by calling used state only once and by passing in an object as a value and that's important not a string or number or anything like that, but an object. And of course in this object, you can now group together, your three States
+
+const [usernput, setUserInput] = useState({
+enteredTitle: "",
+enteredAmount: "",
+enteredDate: "",
+});
+
+You can switch between these approaches. Now, I tend to prefer the individual state slices, And I would say you also see that more often out there in the world, in other react projects, but ultimately both approaches are fine.
+
+// setUserInput({
+// ...usernput,
+// enteredTitle: event.target.value,
+// });
+
+But Here, I'm depending on my previous state for updating the state. In this case, we depend on the previous state
+because we used this one state instead of three-states approach and we need to copy in the other values so that we don't lose them. Hence we depend on the previous state snapshot to copy in the existing values and then just override one value with a new one. Now whenever, and that's another key rule which you should memorize, whenever you update state
+and you depend on the previous state.
+
+Better way of doing above when we use grouping state together
+
+// setUserInput((prevState) => {
+// return { ...prevState, enteredTitle: event.target.value };
+// });
+
+Now why should we do it like this instead of like this? In many cases, both will work fine, but keep in mind that I mentioned that Reacts schedules state updates, it doesn't perform them instantly. And therefore, theoretically,
+if you schedule a lot of state updates at the same time, you could be depending on an outdated or incorrect state snapshot if you use this approach. If you use this approach, React will guarantee that the state snapshot it gives you here in this inner function, will always be the latest state snapshot, keeping all scheduled state updates in mind.
+So this is the safer way to ensure that you always operate on the latest state snapshot. So you should use this function syntax here whenever your state update depends on the previous state. That is something you should memorize.
+If your state update depends on the previous state, use this function form.
+
+2-way bindings:
+How can we clear those inputs?
+
+All we have to do is add the value attribute, which is a default attribute, to this input element. This will set the internal value property, which every input element has. And we can set it to a new value. And here, I will bind this to enteredTitle. So now it is this two-way binding because now we don't just listen to changes in the input to update our state. But we also feed the state back into the input so that when we change the state, we also change input. This might sound like an infinite loop, but it actually isn't. So we won't have a problem there. But the advantage is that when the form is submitted for example, we can call setEnteredTitle. And set this back to an empty string, which also was our initial state. And by doing that, we override what the user entered after the form was submitted and therefore cleared the input.
+
+value={enteredTitle}
+setEnteredTitle("");
