@@ -92,3 +92,75 @@ This is why we need that. That's the under-the-hood, behind-the-scenes stuff
 
 As your project grows and as you have more and more components you might want to organize them into sub folders
 and not just throw them all into one components folder. And, indeed, that is something we can already get started with.Here, we could argue that we have some general UI components some general user interface elements, which are not tied to a specific feature of the app. And then, we got some features specific components, like these components, which are dealing with rendering expenses and expense data. And, therefore, in the components sub folder, we could create an Expenses sub folder, and next to that a UI sub folder for general user interface elements. And we could move the card files into the UI folder and the Expenses, ExpenseItem, and ExpenseDate files into the Expenses folder.
+
+How can you manage more than one State?
+
+It is something we have learned up to this point but it turns out that it is rather simple. You can call useState more than once. You can have multiple States, multiple States slices or State pieces per component. And all of these States inside of one at the same component will then all to be totally separated from each other.
+
+// const [enteredTitle, setEnteredTitle] = useState("");
+// const [enteredAmount, setenteredAmount] = useState("");
+// const [enteredDate, setEnteredDate] = useState("");
+
+However, there also is an alternative and it depends basically on your personal preferences which approach you prefer.
+by calling used state only once and by passing in an object as a value and that's important not a string or number or anything like that, but an object. And of course in this object, you can now group together, your three States
+
+const [usernput, setUserInput] = useState({
+enteredTitle: "",
+enteredAmount: "",
+enteredDate: "",
+});
+
+You can switch between these approaches. Now, I tend to prefer the individual state slices, And I would say you also see that more often out there in the world, in other react projects, but ultimately both approaches are fine.
+
+// setUserInput({
+// ...usernput,
+// enteredTitle: event.target.value,
+// });
+
+But Here, I'm depending on my previous state for updating the state. In this case, we depend on the previous state
+because we used this one state instead of three-states approach and we need to copy in the other values so that we don't lose them. Hence we depend on the previous state snapshot to copy in the existing values and then just override one value with a new one. Now whenever, and that's another key rule which you should memorize, whenever you update state
+and you depend on the previous state.
+
+Better way of doing above when we use grouping state together
+
+// setUserInput((prevState) => {
+// return { ...prevState, enteredTitle: event.target.value };
+// });
+
+Now why should we do it like this instead of like this? In many cases, both will work fine, but keep in mind that I mentioned that Reacts schedules state updates, it doesn't perform them instantly. And therefore, theoretically,
+if you schedule a lot of state updates at the same time, you could be depending on an outdated or incorrect state snapshot if you use this approach. If you use this approach, React will guarantee that the state snapshot it gives you here in this inner function, will always be the latest state snapshot, keeping all scheduled state updates in mind.
+So this is the safer way to ensure that you always operate on the latest state snapshot. So you should use this function syntax here whenever your state update depends on the previous state. That is something you should memorize.
+If your state update depends on the previous state, use this function form.
+
+2-way bindings:
+How can we clear those inputs?
+
+All we have to do is add the value attribute, which is a default attribute, to this input element. This will set the internal value property, which every input element has. And we can set it to a new value. And here, I will bind this to enteredTitle. So now it is this two-way binding because now we don't just listen to changes in the input to update our state. But we also feed the state back into the input so that when we change the state, we also change input. This might sound like an infinite loop, but it actually isn't. So we won't have a problem there. But the advantage is that when the form is submitted for example, we can call setEnteredTitle. And set this back to an empty string, which also was our initial state. And by doing that, we override what the user entered after the form was submitted and therefore cleared the input.
+
+value={enteredTitle}
+setEnteredTitle("");
+
+Props can only be passed from parent to child, we can't skip intermediate components.
+
+Child-to-parent component communication(moving data from child to parent):
+We can do move data from child to parent by utilizing props to recieve a function from the parent component which we call in the child component. This is how we can comunicate up (child-to-parent). for example ExpenseForm component can communicate to NewExpense component in this case.
+<ExpenseForm onSaveExpenseData={saveExpenseDataHandler} /> // saveExpenseDataHandler can be any name as per our choice
+props.onSaveExpenseData(expenseData);
+
+Lifting State Up:
+Consider this basic Component Tree(See pdf) which is roughly what we have in this demo application where we have an app component which in turn renders and expenses and a new expense component. Now, in this case, the new expense component is a component which generates some data, some state. In our example application, we are fetching some user input here.
+Now it is quite common that you do generate or fetch data in a component but that you might not need that data in that component. Instead, we need it in another component, in the expenses component. That's where this generated data is needed in the end, slightly transformed, packed into an object but it is the data we fetch in new expense.
+So naturally we would like to hand that data over but that doesn't work like this because we have no direct connection
+between two sibling components. Instead, as you learned by now, we can only communicate from parent to child
+and from child to parent. That's why in such cases like we have it here, we utilize the closest component,
+the closest parent component which has direct or indirect access to both involved components in this case, the app component. The app component in our application has access to both the new expense and the expenses component because it renders both components in its returned JSX code, that's why we wanna utilize that. Because we can now store our state in that closest involved component. So in that parent component which has access to both involved components by lifting our state up. So by passing our generated state data from the new expense to the app component.
+
+Controlled vs Uncontrolled Component & Stateless vs Stateful Components:
+We created a controlled component and it's not the first time we did that. Basically, whenever you use two way binding
+you are controlling a component but here we're controlling our own custom component. Now, what does this mean?
+It means that a value which is used in the component like the value selected in the dropdown is passed on to a parent component, through props and is received from the parent component. Both the currently set value, as well as the function which in the end handles the selected value is not part of expenses filter. Expenses filter is really just a component that presents DUI, that presents the dropdown and then attaches a couple of listeners or props, but the real logic recites in the parent component and that turns ExpensesFilter into something which is called a controlled component.
+
+Another term or another concept you should be aware of because you might hear it from time to time is about presentational verses stateful components or stateless versus stateful components or dumb versus smart components.
+There are a lot of terms for that, but what do they mean? It simply means that in basically all React apps which you're building, you will have a couple of components that manage some state like this Expenses component which manages this filter state or the ExpenseForm component which manages the input state. And then you will have other components
+which don't manage any state, like ExpenseItem.
+This component is a state less component also called presentational or dumb component because it doesn't have any internal state it's just there to output some data. And in most react applications, you will have more presentational and dumb components than smart or stateful components. So even though dumb might sound negative and it might sound like stateful components are better, that's not the case. These are really just terms and typically you end up with less state full components than with state less components.
