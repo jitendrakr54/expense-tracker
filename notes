@@ -249,3 +249,10 @@ of the Array and then has a look at the number of items that were already render
 And if you do add it, if you add the key to your component or HTML element, then you can help React identify the individual items. For dat you need to set a unique value per list item and dat, for example in this case here
 would be the expense ID because in our expenses Array, every item has a unique ID.
 So long story short. You should always add such a key when mapping out lists of items.
+
+############################### Adding css style dynamically
+. Use style attribute, it's same in JSX as HTML attribute
+. Use curly brace as we use for props then Pass object containing stylesheet as below
+. If stylesheet has multi word property something as background-color then need to quote as 'background-color' or in camel notation backgroundColor
+
+style={{ height: barFillHeight,  backgroundColor: 'red'}}
