@@ -93,9 +93,82 @@ This is why we need that. That's the under-the-hood, behind-the-scenes stuff
 As your project grows and as you have more and more components you might want to organize them into sub folders
 and not just throw them all into one components folder. And, indeed, that is something we can already get started with.Here, we could argue that we have some general UI components some general user interface elements, which are not tied to a specific feature of the app. And then, we got some features specific components, like these components, which are dealing with rendering expenses and expense data. And, therefore, in the components sub folder, we could create an Expenses sub folder, and next to that a UI sub folder for general user interface elements. And we could move the card files into the UI folder and the Expenses, ExpenseItem, and ExpenseDate files into the Expenses folder.
 
-How can you manage more than one State?
+################################################## State ##############################################################
+If we want to change something on page on some event for example I want to change title on button click, ofcourse we can execute a handler which will change the value of title. something like below -
+
+let title = props.title;
+const clickHandler = () => title = 'Updated';
+<button onClick={clickHandler}>Change Title</button>
+
+But title does not changes. simply because react doesn't work like this.
+And that's where now we have to dive into how react actually passes the JSS code and how it considers that and how it brings it on to the screen. There's one key thing which we have to keep in mind that your component is a function.
+This is a function right? Your component is just a regular function, the only special thing about that function, is that it returns JSX. Now since it's a functionsomeone has to call it, and you might notice that we never called our component functions, instead we just used these functions like HTML elements in this JSX code.
+Well, the thing is, under the hood this is almost like a function call. By using our components in JSX code, we make React aware of our component functions.
+
+For example here, we make react aware of the ExpenseItem function. And whenever react evaluates this JSX code, it will call these component functions. And these component functions stand to return JSX code, which is all the evaluated,
+up until there's no more JSX code to be evaluated. So in the case of Expenses.js, if react encounters this ExpenseItem,
+it calls this ExpenseItem component function, executes all the code in there, encounters this JSX code and calls this Card function and this Expense state function and then it goes through the JSX code of this components until there's no more component code left to call. And then it re-evaluates the overall result and translates that into DOM instructions
+which renders something like this on the screen. That's how react works.
+
+Now it's all started by the index.js file, where we initially point at this app component. That's the first component function which is being called and that happens when the react app has been loaded on the screen which happens when the page is been visited. So that's how react goes through all these components executes all these components functions
+and draws something on to the screen. The only problem with that is, that react never repeats that. React goes through all of that when the application is initially rendered, but thereafter it's done.
+
+However in modern applications, of course you sometimes want to update what's visible on the screen, for example because a button was clicked and that button should change some text which is being output. So we need a way of telling react
+that something changed and that a certain component should be re-evaluated and that's where react introduces a special concept called state.
+
+If you have a variable in your component function and the that variable changes, React ignores it. It doesn't care about that, that code executes, sure, but the overall component function doesn't execute again just because some variable changed. How can you manage more than one State? And as a side note, even if it would execute again, of course then title, this variable, would all just be recreated and re initialized to the props value. Because as part of this component function we are creating this title variable.
 
 It is something we have learned up to this point but it turns out that it is rather simple. You can call useState more than once. You can have multiple States, multiple States slices or State pieces per component. And all of these States inside of one at the same component will then all to be totally separated from each other.
+This ExpenseItem component function currently is not called a second time after the initial rendering just because a click occurred or because a variable changed does not trigger this component function to run again. So to tell React that it should run it again, we need to import something from the React library.
+
+########### useState():
+And we want to import a function here, a function which is called useState. This is a function provided by the React library which allows us to define values as state where changes to these values should reflect in the component function being called again, which is a key difference to the regular variable we're using here.
+
+Now, how do we use this useState function though? Inside of our component function and that's important, just call useState. And useState is a so-called React hook. There are other hooks as well, And all these React hooks can be recognized by the fact that they start with the word "use" in their name, and all these hooks must only be called
+inside of React component functions like ExpenseItem. They can't be called outside of these functions. And they all just shouldn't be called in any nested functions. They must be called directly inside such component functions.
+Now, useState doesn't work just like that. Instead, useState once a default state value, because with useState we basically create a special kind of variable, you could say, a variable where changes will lead this component function to be called again. And of course we can therefore assign an initial value for that special variable, So here, my initial value is props.title. And we simply pass this as an argument to useState. Now does special variable is created.
+Of course, we also want to be able to use that variable, we want to be able to use it down here, and therefore useState also returns something. It gives us access to this special variable. However, it does not just return that,
+it also returns a function which we can then call to assign a new value to that variable. So we'll not be assigning values like this with the equal sign, instead, we will be assigning new values by calling a function. That's just how this state variable thing works.
+
+const [title, setTitle] = useState(props.title);
+
+And for that useState actually returns an array where the first value is the variable itself, you could say, the value itself. And the second element in the array is that updating function.
+The first element, is a pointer at that managed value. So initially at props title (title), the value stored in props.title,and the second element here is a function (setTitle) which we can later call to set a new title.
+And it's always the case that the first element is the current state value. And the second element is a function for updating that.
+And thereafter we would want to assign new value on button click which means we need to assign that value in handler.
+and we're not going to assign a new value with an equal sign. Instead, we assign a new value by calling setTitle.
+So by calling this state updating function and then we just passed a new value as argument, in this case updated.
+
+const clickHandler = () => {
+setTitle('Updated');
+};
+
+<h2>{title}</h2>
+
+Now, why does it work like this though? Why do we have this state updating function instead of assigning a new value like this? The reason for that is, that calling this function does not just assign a new value to some variable,
+but that instead it is a special variable to begin with. It's managed by React somewhere in memory. And when we call this state updating function, this special variable will not just receive a new value but, and that's important,
+the component function in which you called this state updating function. And in which you initialized your state with useState will be executed again. And that is exactly what we need. We want to call this component function again
+when our state changes. And by calling this state updating function that's happening. Because by calling this function,
+you're telling React that you wanna assign a new value to this state. And that then also tells React that the component in which this state was registered with useState should be re-evaluated. And therefore React will go ahead and execute this component function again, and therefore also evaluate this JSX code again. And then it will draw any changes which it's detects compared to the last time it evaluated this onto the screen.
+
+And that therefore we see our updated value on the screen. That's how React state works. And this is another key concept in React. If you have data, which might change, and where changes to that data should be reflected on the user interface
+then you need state because a regular variables will not do the trick with state, however you can set and change values.
+And when they do change, React will re-evaluate the component in which the state was registered. And only that component, by the way not any other components, just this component in which this state was registered.
+
+UseState registers some State, so some value as a State for the component in which it is being called. And I wanna be even more precise here. It registers it for a specific component instance. For example, ExpenseItem here is being used four times, right? And Expenses.js we have four ExpenseItems. Now, every item receives its own separate State
+which is detached from the other States. We have one ExpenseItem definition here, but then this function is basically called four times when we create four ExpenseItems. And every time it's called, a new separate State is created
+of course in the same way but managed independently by React. So if we change the title in the first ExpenseItem
+the other ones are not affected because they have their own State. That's really important. It's on a per component instance basis. So we have separate States, even if we create a component more than once. And that's of course crucial because it would be a rather undesired behavior if we change something in one item and all the other items are updated as well. Now, in addition, whenever State changes because we click a button in this case it's only this component function and only that specific instance where this component is being used where React will re-evaluate it.
+Only that specific instance is being updated and therefore for being re-evaluated, and the other instances are not effected by that State change. And that's important to keep in mind that State really is separated on a per component instance basis.
+
+########## How do we get the latest title value then though?
+Well, keep in mind that the component function is re-executed when the State is updated. And therefore, of course, this line of code, line nine, also is executed again whenever the component function is executed again. So if we called setTitle and we assign a new title, that leads to this component being called again and therefore, this new title, this updated title is fetched from React, which manages the State for us. Basically we go to React and say, "Hey please give me that latest title State which I told you to manage for me." And React provides us this latest State in this array
+which useState always returns. So we always get a brand new snapshot of that State when this component function re-executes. That's how this works under the hood.
+Now you might be wondering if that doesn't mean that we always overwrite any State changes with props.title again, here.
+const [title, setTitle] = useState(props.title);
+And here, the special thing is that React keeps track of when we call useState in a given component instance for the first time. And when we call it for the first time ever, it'll take that argument as an initial value. But if a component is then re-executed because of such a State change, for example, React will not reinitialize the State.
+Instead, it will detect that this State had been initialized in the past, and it will just grab the latest State
+which is based on some State update, for example, and give us that State instead. So this initial value is really only considered when this component function is being executed for the first time, for a given component instance.
 
 // const [enteredTitle, setEnteredTitle] = useState("");
 // const [enteredAmount, setenteredAmount] = useState("");
@@ -164,3 +237,15 @@ Another term or another concept you should be aware of because you might hear it
 There are a lot of terms for that, but what do they mean? It simply means that in basically all React apps which you're building, you will have a couple of components that manage some state like this Expenses component which manages this filter state or the ExpenseForm component which manages the input state. And then you will have other components
 which don't manage any state, like ExpenseItem.
 This component is a state less component also called presentational or dumb component because it doesn't have any internal state it's just there to output some data. And in most react applications, you will have more presentational and dumb components than smart or stateful components. So even though dumb might sound negative and it might sound like stateful components are better, that's not the case. These are really just terms and typically you end up with less state full components than with state less components.
+
+Understanding "Keys":
+So why are we getting this key warning? After all it looks like everything works. Well React has a special concept when it comes to rendering lists of data a concept which exists to ensure that React is able to update and render such lists efficiently without performance losses, or bugs, which may occur.
+
+So what actually happens here when I add a new item is that React, renders this new item as the last item in this list of div's and updates all items and replace their content, such that it again matches the order of the items in my Array.And this is not great. This is happening because to React all these items look similar and it only sees that my Array changed that it's now longer than before. And hence it simply renders an additional div and it adds that at the end.
+And then it simply walks through all the items and updates the content inside of every item to match the Array content again. The final result, therefore is correct here but from a performance perspective this is not great because all items are visited and updated and it can even lead to bugs. If the expense items would be state full items and we would have some state managed inside of that.
+
+why does React, behave like this? The answer is because it has no other way. It currently simply checks the length
+of the Array and then has a look at the number of items that were already rendered. The individual items all look similar to React though so it can't know where a new item should be added or anything like that. That's why we get this warning because we have a way of telling react where a new item it should be added. And we do that by going to the place where we output our list of items. So does map method here and we then add a special prop to this item here. And that's the "key" prop. This is not a prop we are using instead of expense item but instead it's a prop you can add to any component no matter if it's a custom component by you or if it's a built in HTML element, you can always add this.
+And if you do add it, if you add the key to your component or HTML element, then you can help React identify the individual items. For dat you need to set a unique value per list item and dat, for example in this case here
+would be the expense ID because in our expenses Array, every item has a unique ID.
+So long story short. You should always add such a key when mapping out lists of items.
